@@ -1,15 +1,15 @@
 <template>
   <div class="space-y-6" v-if="operation">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-semibold">جزئیات عملیات {{ operation.caseNumber }}</h2>
-        <p class="text-sm opacity-70">{{ operation.orRoom }} · {{ operation.surgeon }}</p>
-      </div>
-      <div class="flex items-center gap-3">
+    <PageHeader
+      :title="`جزئیات عملیات ${operation.caseNumber}`"
+      :subtitle="`${operation.orRoom} · ${operation.surgeon}`"
+    >
+      <template #actions>
+        <RouterLink to="/app/operations" class="btn btn-ghost btn-sm">بازگشت به عملیات</RouterLink>
         <Badge :label="statusLabel(operation.status)" :variant="statusVariant(operation.status)" />
-        <button class="btn btn-primary" @click="createModalOpen = true">ثبت رویداد جدید</button>
-      </div>
-    </div>
+        <button class="btn btn-primary btn-sm" @click="createModalOpen = true">ثبت رویداد جدید</button>
+      </template>
+    </PageHeader>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <div class="card bg-base-200">
@@ -35,6 +35,30 @@
           <h3 class="card-title">خط زمانی رویدادها</h3>
           <Timeline :events="timelineItems" />
         </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h3 class="card-title">رویدادهای مرتبط</h3>
+          <RouterLink to="/kiosk" class="btn btn-outline btn-sm">ثبت رویداد برای این عملیات</RouterLink>
+        </div>
+        <DataTable :headers="['زمان', 'گیت', 'اقدام', 'جزئیات']">
+          <tr v-for="event in operationEvents" :key="event.id">
+            <td>{{ event.timestamp }}</td>
+            <td>{{ event.gateName }}</td>
+            <td>{{ actionLabel(event.action) }}</td>
+            <td>
+              <RouterLink class="link" :to="`/app/events/${event.id}`">مشاهده رویداد</RouterLink>
+            </td>
+          </tr>
+        </DataTable>
+        <EmptyState
+          v-if="!operationEvents.length"
+          title="رویدادی برای این عملیات ثبت نشده است"
+          description="برای ثبت رویداد جدید از حالت کیوسک استفاده کنید."
+        />
       </div>
     </div>
 
@@ -76,7 +100,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useDataStore } from '../../stores/data'
 import { useAuthStore } from '../../stores/auth'
 import DataTable from '../../components/DataTable.vue'
@@ -84,6 +108,7 @@ import Badge from '../../components/Badge.vue'
 import Timeline from '../../components/Timeline.vue'
 import EmptyState from '../../components/EmptyState.vue'
 import ConfirmItemsModal from '../../components/ConfirmItemsModal.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { DetectedItem, Operation } from '../../types'
 
 const route = useRoute()
@@ -102,7 +127,7 @@ const draftItems = ref<DetectedItem[]>([])
 
 onMounted(async () => {
   await Promise.all([dataStore.loadEvents({ operationId }), dataStore.loadGates(), dataStore.loadObjectTypes()])
-  operation.value = await dataStore.loadOperationById(operationId)
+  operation.value = (await dataStore.loadOperationById(operationId)) ?? null
   if (!draftItems.value.length) {
     draftItems.value = dataStore.objectTypes.map((item) => ({
       objectTypeId: item.id,

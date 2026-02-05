@@ -9,6 +9,10 @@
       <div class="text-lg font-semibold">مرکز کنترل رهگیری</div>
     </div>
     <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2">
+        <RouterLink to="/kiosk" class="btn btn-primary btn-sm">ثبت رویداد جدید</RouterLink>
+        <RouterLink to="/kiosk" class="btn btn-ghost btn-sm">حالت کیوسک</RouterLink>
+      </div>
       <button class="btn btn-ghost" @click="uiStore.toggleTheme()">
         {{ uiStore.theme === 'light' ? 'حالت تیره' : 'حالت روشن' }}
       </button>
@@ -28,15 +32,15 @@
 <script setup lang="ts">
 import { useAuthStore } from '../stores/auth'
 import { useUiStore } from '../stores/ui'
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const uiStore = useUiStore()
 const router = useRouter()
-const route = useRoute()
 
-const drawerId = computed(() => (route.path.startsWith('/admin') ? 'admin-drawer' : 'supporter-drawer'))
+defineProps<{
+  drawerId: string
+}>()
 
 const handleLogout = () => {
   authStore.logout()

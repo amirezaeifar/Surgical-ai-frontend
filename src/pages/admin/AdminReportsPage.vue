@@ -1,9 +1,10 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">گزارش‌ها</h2>
-      <button class="btn btn-primary" @click="exportCsv">خروجی CSV</button>
-    </div>
+    <PageHeader title="گزارش‌ها" subtitle="خلاصه عملکرد گیت‌ها و رویدادها">
+      <template #actions>
+        <button class="btn btn-primary btn-sm" @click="exportCsv">خروجی CSV</button>
+      </template>
+    </PageHeader>
 
     <div class="grid gap-4 md:grid-cols-2">
       <div class="card bg-base-200">
@@ -29,12 +30,20 @@
         </div>
       </div>
     </div>
+
+    <EmptyState
+      v-if="!dataStore.events.length"
+      title="داده‌ای برای گزارش وجود ندارد"
+      description="پس از ثبت رویدادها، نمودارهای گزارش فعال می‌شوند."
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useDataStore } from '../../stores/data'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 
 const dataStore = useDataStore()
 const actions = ['ISSUE', 'RETURN', 'TRANSFER', 'CLEAN_IN', 'CLEAN_OUT', 'AUDIT_CHECK', 'EXCEPTION']

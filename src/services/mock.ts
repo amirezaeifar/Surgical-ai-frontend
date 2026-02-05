@@ -75,11 +75,13 @@ export const mockGetEvents = async (filters?: GateEventFilters): Promise<GateEve
   if (filters?.operationId) {
     events = events.filter((event) => event.operationId === filters.operationId)
   }
-  if (filters?.dateFrom) {
-    events = events.filter((event) => event.timestamp >= filters.dateFrom)
+  const dateFrom = filters?.dateFrom
+  if (dateFrom) {
+    events = events.filter((event) => event.timestamp >= dateFrom)
   }
-  if (filters?.dateTo) {
-    events = events.filter((event) => event.timestamp <= filters.dateTo)
+  const dateTo = filters?.dateTo
+  if (dateTo) {
+    events = events.filter((event) => event.timestamp <= dateTo)
   }
   return events
 }

@@ -1,5 +1,17 @@
 <template>
   <div class="space-y-6">
+    <PageHeader title="داشبورد پشتیبان" subtitle="خلاصه وضعیت عملیات و رویدادها">
+      <template #actions>
+        <RouterLink to="/app/operations" class="btn btn-ghost btn-sm">عملیات</RouterLink>
+        <RouterLink to="/app/events" class="btn btn-ghost btn-sm">رویدادها</RouterLink>
+        <RouterLink to="/app/reconciliation" class="btn btn-primary btn-sm">تطبیق کلین‌روم</RouterLink>
+      </template>
+    </PageHeader>
+
+    <div v-if="dataStore.loading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div v-for="index in 4" :key="index" class="skeleton h-24 rounded-box"></div>
+    </div>
+
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <div class="stat bg-base-200 rounded-box">
         <div class="stat-title">عملیات فعال</div>
@@ -20,6 +32,30 @@
         <div class="stat-title">اقلام گمشده</div>
         <div class="stat-value">{{ missingItems }}</div>
         <div class="stat-desc">در عملیات فعال</div>
+      </div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title">عملیات جاری</h3>
+          <p class="text-sm opacity-70">مدیریت عملیات و ثبت رویدادهای جدید.</p>
+          <RouterLink to="/app/operations" class="btn btn-primary btn-sm">مشاهده عملیات</RouterLink>
+        </div>
+      </div>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title">رویدادها</h3>
+          <p class="text-sm opacity-70">پیگیری آخرین رویدادهای ثبت‌شده.</p>
+          <RouterLink to="/app/events" class="btn btn-outline btn-sm">مشاهده رویدادها</RouterLink>
+        </div>
+      </div>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title">تطبیق کلین‌روم</h3>
+          <p class="text-sm opacity-70">بررسی اقلام باقی‌مانده و پیگیری مغایرت‌ها.</p>
+          <RouterLink to="/app/reconciliation" class="btn btn-ghost btn-sm">رفتن به تطبیق</RouterLink>
+        </div>
       </div>
     </div>
 
@@ -59,6 +95,11 @@
               <td>{{ actionLabel(event.action) }}</td>
             </tr>
           </DataTable>
+          <EmptyState
+            v-if="!events.length"
+            title="رویدادی ثبت نشده است"
+            description="ثبت رویداد جدید از طریق حالت کیوسک انجام می‌شود."
+          />
         </div>
       </div>
     </div>
@@ -67,10 +108,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useDataStore } from '../../stores/data'
 import Badge from '../../components/Badge.vue'
 import DataTable from '../../components/DataTable.vue'
 import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 
 const dataStore = useDataStore()
 

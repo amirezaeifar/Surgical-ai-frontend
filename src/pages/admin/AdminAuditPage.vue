@@ -1,6 +1,10 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-xl font-semibold">لاگ ممیزی</h2>
+    <PageHeader title="لاگ ممیزی" subtitle="بازبینی رویدادهای ثبت شده به تفکیک گیت">
+      <template #actions>
+        <RouterLink to="/admin/reports" class="btn btn-ghost btn-sm">گزارش‌ها</RouterLink>
+      </template>
+    </PageHeader>
     <DataTable :headers="['زمان', 'عملیات', 'گیت', 'اقدام', 'تایید']">
       <tr v-for="event in dataStore.events" :key="event.id">
         <td>{{ event.timestamp }}</td>
@@ -10,13 +14,21 @@
         <td>{{ verificationLabel(event.verification) }}</td>
       </tr>
     </DataTable>
+    <EmptyState
+      v-if="!dataStore.events.length"
+      title="لاگی برای نمایش وجود ندارد"
+      description="پس از ثبت رویدادها، لاگ ممیزی تکمیل می‌شود."
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 
 const dataStore = useDataStore()
 

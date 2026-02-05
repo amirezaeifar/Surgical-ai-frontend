@@ -1,12 +1,14 @@
 <template>
   <div class="space-y-6" v-if="event">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-semibold">جزئیات رویداد {{ event.id }}</h2>
-        <p class="text-sm opacity-70">{{ event.timestamp }} · {{ event.gateName }}</p>
-      </div>
-      <Badge :label="verificationLabel(event.verification)" :variant="verificationVariant(event.verification)" />
-    </div>
+    <PageHeader :title="`جزئیات رویداد ${event.id}`" :subtitle="`${event.timestamp} · ${event.gateName}`">
+      <template #actions>
+        <RouterLink to="/app/events" class="btn btn-ghost btn-sm">بازگشت به رویدادها</RouterLink>
+        <RouterLink :to="`/app/operations/${event.operationId}`" class="btn btn-outline btn-sm">
+          مشاهده عملیات
+        </RouterLink>
+        <Badge :label="verificationLabel(event.verification)" :variant="verificationVariant(event.verification)" />
+      </template>
+    </PageHeader>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <div class="card bg-base-200">
@@ -37,7 +39,12 @@
       <div class="card-body">
         <h3 class="card-title">جزئیات متادیتا</h3>
         <div class="grid gap-4 md:grid-cols-2">
-          <div><span class="font-semibold">عملیات:</span> {{ operationLabel(event.operationId) }}</div>
+          <div>
+            <span class="font-semibold">عملیات:</span>
+            <RouterLink class="link" :to="`/app/operations/${event.operationId}`">
+              {{ operationLabel(event.operationId) }}
+            </RouterLink>
+          </div>
           <div><span class="font-semibold">حامی:</span> {{ event.userName }}</div>
           <div><span class="font-semibold">اقدام:</span> {{ actionLabel(event.action) }}</div>
           <div><span class="font-semibold">یادداشت:</span> {{ event.notes || '—' }}</div>
@@ -50,11 +57,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
 import Badge from '../../components/Badge.vue'
 import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { GateEvent } from '../../types'
 
 const route = useRoute()
@@ -66,7 +74,7 @@ const placeholder = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a
 onMounted(async () => {
   await Promise.all([dataStore.loadEvents(), dataStore.loadOperations()])
   const eventId = route.params.id as string
-  event.value = await dataStore.loadEventById(eventId)
+  event.value = (await dataStore.loadEventById(eventId)) ?? null
 })
 
 const operationLabel = (operationId: string) => {

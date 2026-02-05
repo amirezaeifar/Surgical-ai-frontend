@@ -1,6 +1,11 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-xl font-semibold">داشبورد مدیریتی</h2>
+    <PageHeader title="داشبورد مدیریتی" subtitle="نمای کلی وضعیت سامانه">
+      <template #actions>
+        <RouterLink to="/admin/users" class="btn btn-ghost btn-sm">کاربران</RouterLink>
+        <RouterLink to="/admin/reports" class="btn btn-primary btn-sm">گزارش‌ها</RouterLink>
+      </template>
+    </PageHeader>
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <div class="stat bg-base-200 rounded-box">
         <div class="stat-title">کاربران</div>
@@ -29,6 +34,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useDataStore } from '../../stores/data'
+import { RouterLink } from 'vue-router'
+import PageHeader from '../../components/PageHeader.vue'
 
 const dataStore = useDataStore()
 
