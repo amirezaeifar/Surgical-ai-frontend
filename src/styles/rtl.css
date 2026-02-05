@@ -1,0 +1,12 @@
+.drawer-side {
+  right: 0;
+  left: auto;
+}
+
+.drawer-toggle:checked ~ .drawer-side {
+  transform: translateX(0);
+}
+
+.drawer-side {
+  transform: translateX(100%);
+}
