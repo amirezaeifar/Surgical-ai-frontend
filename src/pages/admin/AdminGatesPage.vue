@@ -1,9 +1,10 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">مدیریت گیت‌ها</h2>
-      <button class="btn btn-primary" @click="openForm()">گیت جدید</button>
-    </div>
+    <PageHeader title="مدیریت گیت‌ها" subtitle="پیکربندی مسیرهای عبور و تجهیزات متصل">
+      <template #actions>
+        <button class="btn btn-primary btn-sm" @click="openForm()">گیت جدید</button>
+      </template>
+    </PageHeader>
 
     <DataTable :headers="['نام', 'مکان', 'نوع', 'دستگاه', 'وضعیت', 'عملیات']">
       <tr v-for="gate in dataStore.gates" :key="gate.id">
@@ -18,6 +19,12 @@
         </td>
       </tr>
     </DataTable>
+
+    <EmptyState
+      v-if="!dataStore.gates.length"
+      title="گیتی ثبت نشده است"
+      description="برای اتصال تجهیزات جدید، یک گیت اضافه کنید."
+    />
 
     <dialog class="modal" :open="formOpen">
       <div class="modal-box">
@@ -50,6 +57,8 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { Gate } from '../../types'
 
 const dataStore = useDataStore()

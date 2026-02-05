@@ -1,16 +1,26 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">تطبیق کلین‌روم</h2>
-      <button class="btn btn-outline" @click="refresh">بازآوری</button>
-    </div>
+    <PageHeader title="تطبیق کلین‌روم" subtitle="کنترل مغایرت اقلام و ثبت رویدادهای استثنا">
+      <template #actions>
+        <button class="btn btn-outline btn-sm" @click="refresh">بازآوری</button>
+      </template>
+    </PageHeader>
 
     <DataTable :headers="['عملیات', 'ابزار', 'مانده', 'آخرین محل ثبت شده', 'اقدام']">
       <tr v-for="row in reconciliationRows" :key="row.key">
-        <td>{{ row.caseNumber }}</td>
+        <td>
+          <RouterLink class="link" :to="`/app/operations/${row.operationId}`">
+            {{ row.caseNumber }}
+          </RouterLink>
+        </td>
         <td>{{ row.objectTypeName }}</td>
         <td class="text-error font-semibold">{{ row.remaining }}</td>
-        <td>{{ row.lastSeen }}</td>
+        <td>
+          <RouterLink v-if="row.lastEventId" class="link" :to="`/app/events/${row.lastEventId}`">
+            {{ row.lastSeen }}
+          </RouterLink>
+          <span v-else>{{ row.lastSeen }}</span>
+        </td>
         <td>
           <button class="btn btn-sm" @click="openException(row)">ایجاد رویداد استثنا</button>
         </td>
@@ -47,8 +57,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { useDataStore } from '../../stores/data'
 import { useAuthStore } from '../../stores/auth'
+import { RouterLink } from 'vue-router'
 import DataTable from '../../components/DataTable.vue'
 import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { DetectedItem } from '../../types'
 
 const dataStore = useDataStore()
@@ -66,7 +78,16 @@ const refresh = async () => {
 onMounted(refresh)
 
 const reconciliationRows = computed(() => {
-  const rows: { key: string; caseNumber: string; objectTypeId: string; objectTypeName: string; remaining: number; lastSeen: string }[] = []
+  const rows: {
+    key: string
+    caseNumber: string
+    operationId: string
+    objectTypeId: string
+    objectTypeName: string
+    remaining: number
+    lastSeen: string
+    lastEventId?: string
+  }[] = []
   dataStore.operations.forEach((operation) => {
     dataStore.objectTypes.forEach((type) => {
       const issued = dataStore.events
@@ -83,10 +104,12 @@ const reconciliationRows = computed(() => {
         rows.push({
           key: `${operation.id}-${type.id}`,
           caseNumber: operation.caseNumber,
+          operationId: operation.id,
           objectTypeId: type.id,
           objectTypeName: type.name,
           remaining,
-          lastSeen: lastEvent ? `${lastEvent.gateName} · ${lastEvent.timestamp}` : 'نامشخص'
+          lastSeen: lastEvent ? `${lastEvent.gateName} · ${lastEvent.timestamp}` : 'نامشخص',
+          lastEventId: lastEvent?.id
         })
       }
     })

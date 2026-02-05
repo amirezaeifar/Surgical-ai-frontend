@@ -1,10 +1,12 @@
 <template>
-  <div class="drawer lg:drawer-open">
+  <div class="drawer drawer-end lg:drawer-open min-h-screen w-full bg-base-200">
     <input id="admin-drawer" type="checkbox" class="drawer-toggle" v-model="uiStore.drawerOpen" />
-    <div class="drawer-content flex flex-col">
-      <AppNavbar />
-      <main class="p-6">
-        <RouterView />
+    <div class="drawer-content min-h-screen flex flex-col">
+      <AppNavbar class="shrink-0" drawer-id="admin-drawer" />
+      <main class="flex-1 overflow-y-auto">
+        <div class="p-4 md:p-6">
+          <RouterView />
+        </div>
       </main>
     </div>
     <div class="drawer-side">

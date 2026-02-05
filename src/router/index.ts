@@ -26,39 +26,63 @@ const router = createRouter({
     {
       path: '/login',
       component: AuthLayout,
-      children: [{ path: '', name: 'login', component: LoginPage }]
+      children: [
+        {
+          path: '',
+          name: 'login',
+          component: LoginPage,
+          meta: { title: 'ورود' }
+        }
+      ]
     },
     {
       path: '/app',
       component: SupporterLayout,
+      meta: { title: 'پشتیبان' },
       children: [
         { path: '', redirect: '/app/dashboard' },
-        { path: 'dashboard', name: 'dashboard', component: DashboardPage },
-        { path: 'operations', name: 'operations', component: OperationsPage },
-        { path: 'operations/:id', name: 'operation-detail', component: OperationDetailPage },
-        { path: 'events', name: 'events', component: EventsPage },
-        { path: 'events/:id', name: 'event-detail', component: EventDetailPage },
-        { path: 'reconciliation', name: 'reconciliation', component: ReconciliationPage },
-        { path: 'gates', name: 'gates', component: GatesPage }
+        { path: 'dashboard', name: 'dashboard', component: DashboardPage, meta: { title: 'داشبورد' } },
+        { path: 'operations', name: 'operations', component: OperationsPage, meta: { title: 'عملیات' } },
+        {
+          path: 'operations/:id',
+          name: 'operation-detail',
+          component: OperationDetailPage,
+          meta: { title: 'جزئیات عملیات' }
+        },
+        { path: 'events', name: 'events', component: EventsPage, meta: { title: 'رویدادها' } },
+        {
+          path: 'events/:id',
+          name: 'event-detail',
+          component: EventDetailPage,
+          meta: { title: 'جزئیات رویداد' }
+        },
+        { path: 'reconciliation', name: 'reconciliation', component: ReconciliationPage, meta: { title: 'تطبیق کلین‌روم' } },
+        { path: 'gates', name: 'gates', component: GatesPage, meta: { title: 'گیت‌ها' } }
       ]
     },
     {
       path: '/admin',
       component: AdminLayout,
+      meta: { title: 'مدیریت' },
       children: [
         { path: '', redirect: '/admin/overview' },
-        { path: 'overview', name: 'admin-overview', component: AdminOverviewPage },
-        { path: 'users', name: 'admin-users', component: AdminUsersPage },
-        { path: 'gates', name: 'admin-gates', component: AdminGatesPage },
-        { path: 'object-types', name: 'admin-object-types', component: AdminObjectTypesPage },
-        { path: 'reports', name: 'admin-reports', component: AdminReportsPage },
-        { path: 'audit', name: 'admin-audit', component: AdminAuditPage }
+        { path: 'overview', name: 'admin-overview', component: AdminOverviewPage, meta: { title: 'نمای کلی' } },
+        { path: 'users', name: 'admin-users', component: AdminUsersPage, meta: { title: 'کاربران' } },
+        { path: 'gates', name: 'admin-gates', component: AdminGatesPage, meta: { title: 'گیت‌ها' } },
+        {
+          path: 'object-types',
+          name: 'admin-object-types',
+          component: AdminObjectTypesPage,
+          meta: { title: 'انواع ابزار' }
+        },
+        { path: 'reports', name: 'admin-reports', component: AdminReportsPage, meta: { title: 'گزارش‌ها' } },
+        { path: 'audit', name: 'admin-audit', component: AdminAuditPage, meta: { title: 'لاگ ممیزی' } }
       ]
     },
     {
       path: '/kiosk',
       component: KioskLayout,
-      children: [{ path: '', name: 'kiosk', component: KioskPage }]
+      children: [{ path: '', name: 'kiosk', component: KioskPage, meta: { title: 'حالت کیوسک' } }]
     },
     { path: '/', redirect: '/login' }
   ]
@@ -80,6 +104,12 @@ router.beforeEach((to) => {
     return authStore.currentUser?.role === 'ADMIN' ? '/admin/overview' : '/app/dashboard'
   }
   return true
+})
+
+router.afterEach((to) => {
+  const baseTitle = 'رهگیری تجهیزات جراحی چندگیت'
+  const matchedTitle = [...to.matched].reverse().find((record) => record.meta?.title)?.meta?.title
+  document.title = matchedTitle ? `${matchedTitle} | ${baseTitle}` : baseTitle
 })
 
 export default router

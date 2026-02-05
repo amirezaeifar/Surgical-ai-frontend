@@ -1,9 +1,10 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">مدیریت کاربران</h2>
-      <button class="btn btn-primary" @click="openForm()">کاربر جدید</button>
-    </div>
+    <PageHeader title="مدیریت کاربران" subtitle="ایجاد، ویرایش و تخصیص نقش کاربران">
+      <template #actions>
+        <button class="btn btn-primary btn-sm" @click="openForm()">کاربر جدید</button>
+      </template>
+    </PageHeader>
 
     <DataTable :headers="['نام', 'نقش', 'کد پرسنلی', 'دپارتمان', 'عملیات']">
       <tr v-for="user in dataStore.users" :key="user.id">
@@ -17,6 +18,12 @@
         </td>
       </tr>
     </DataTable>
+
+    <EmptyState
+      v-if="!dataStore.users.length"
+      title="کاربری ثبت نشده است"
+      description="برای شروع، یک کاربر جدید اضافه کنید."
+    />
 
     <dialog class="modal" :open="formOpen">
       <div class="modal-box">
@@ -43,6 +50,8 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { User } from '../../types'
 
 const dataStore = useDataStore()

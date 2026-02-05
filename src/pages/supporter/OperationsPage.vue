@@ -1,8 +1,14 @@
 <template>
   <div class="space-y-6">
+    <PageHeader title="لیست عملیات" subtitle="وضعیت آخرین جراحی‌ها و ابزارهای مرتبط">
+      <template #actions>
+        <RouterLink to="/kiosk" class="btn btn-primary btn-sm">ثبت رویداد جدید</RouterLink>
+      </template>
+    </PageHeader>
+
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">لیست عملیات</h2>
       <span class="text-sm opacity-70">{{ filteredOperations.length }} مورد</span>
+      <RouterLink to="/app/events" class="btn btn-ghost btn-sm">مشاهده رویدادها</RouterLink>
     </div>
 
     <FilterBar>
@@ -15,7 +21,7 @@
       </select>
     </FilterBar>
 
-    <DataTable :headers="['شماره کیس', 'اتاق عمل', 'جراح', 'زمان شروع', 'وضعیت', 'جزئیات']">
+    <DataTable :headers="['شماره کیس', 'اتاق عمل', 'جراح', 'زمان شروع', 'وضعیت', 'جزئیات', 'اقدام سریع']">
       <tr v-for="operation in filteredOperations" :key="operation.id">
         <td>{{ operation.caseNumber }}</td>
         <td>{{ operation.orRoom }}</td>
@@ -27,8 +33,17 @@
         <td>
           <RouterLink class="link" :to="`/app/operations/${operation.id}`">مشاهده</RouterLink>
         </td>
+        <td>
+          <RouterLink class="btn btn-xs btn-outline" to="/kiosk">ثبت رویداد</RouterLink>
+        </td>
       </tr>
     </DataTable>
+
+    <EmptyState
+      v-if="!filteredOperations.length"
+      title="عملیاتی برای نمایش وجود ندارد"
+      description="با تعریف عملیات جدید یا ثبت رویداد، لیست به‌روزرسانی می‌شود."
+    />
   </div>
 </template>
 
@@ -39,6 +54,8 @@ import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
 import FilterBar from '../../components/FilterBar.vue'
 import Badge from '../../components/Badge.vue'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 
 const dataStore = useDataStore()
 const search = ref('')

@@ -1,9 +1,10 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">مدیریت انواع ابزار</h2>
-      <button class="btn btn-primary" @click="openForm()">نوع جدید</button>
-    </div>
+    <PageHeader title="مدیریت انواع ابزار" subtitle="کاتالوگ ابزارها و روش رهگیری آن‌ها">
+      <template #actions>
+        <button class="btn btn-primary btn-sm" @click="openForm()">نوع جدید</button>
+      </template>
+    </PageHeader>
 
     <DataTable :headers="['نام', 'نوع رهگیری', 'عملیات']">
       <tr v-for="type in dataStore.objectTypes" :key="type.id">
@@ -15,6 +16,12 @@
         </td>
       </tr>
     </DataTable>
+
+    <EmptyState
+      v-if="!dataStore.objectTypes.length"
+      title="ابزاری ثبت نشده است"
+      description="برای شروع، یک نوع ابزار تعریف کنید."
+    />
 
     <dialog class="modal" :open="formOpen">
       <div class="modal-box">
@@ -39,6 +46,8 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useDataStore } from '../../stores/data'
 import DataTable from '../../components/DataTable.vue'
+import EmptyState from '../../components/EmptyState.vue'
+import PageHeader from '../../components/PageHeader.vue'
 import type { SurgicalObjectType } from '../../types'
 
 const dataStore = useDataStore()
